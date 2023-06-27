@@ -100,8 +100,7 @@ def arg_parser():
 
 def main():
     """
-    Main function of the script, here the command line arguments are collected and processed.
-    :return int: 0 if the script is executed correctly, otherwise an error code.
+    Main function of the script.
     """
     # Collect command line arguments
     args = arg_parser()
