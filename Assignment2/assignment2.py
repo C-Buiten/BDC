@@ -10,11 +10,9 @@ import sys
 import time
 import queue
 import argparse as ap
-from assignment1_redo import calc_scores
+from assignment1_redo import calc_scores, split_files
 
-# Constants
-asciiDict = {i: chr(i) for i in range(128)}
-ascii_dict = {v: k for k, v in asciiDict.items()}
+
 POISONPILL = "MEMENTOMORI"
 ERROR = "DOH"
 AUTHKEY = b'whathasitgotinitspocketsesss?'
@@ -47,24 +45,6 @@ def make_server_manager(port, host):
     return manager
 
 
-def chunk_data(filename, cores):
-    """Function to allocate chunk data to cores"""
-    with open(filename[0], 'r', encoding='utf-8') as open_file:
-        for line, _ in enumerate(open_file):
-            pass
-    file_len = line + 1
-
-    # Calculate how big chunk size should be
-    chunk_size = int(file_len / cores[0])
-
-    while chunk_size % 4 != 0:
-        chunk_size += chunk_size % 4
-
-    # Generating chunks
-    line_list = [[x, x + chunk_size] for x in range(0, file_len, chunk_size)]
-    return line_list
-
-
 def runserver(function, fastq, cores, port, host, output_file=None):
     """
     Runs server
@@ -80,7 +60,7 @@ def runserver(function, fastq, cores, port, host, output_file=None):
     shared_job_q = manager.get_job_q()
     shared_result_q = manager.get_result_q()
 
-    chunks = chunk_data(fastq, cores)
+    chunks = split_files(fastq, cores)
 
     if not chunks:
         print("Zzzz...")
@@ -114,7 +94,6 @@ def runserver(function, fastq, cores, port, host, output_file=None):
     print("Aaaaaaaaaaaaand we're done for the server!")
     manager.shutdown()
 
-    # Writes to output file if output file was given
     if output_file:
         print("Output file!")
         with open(output_file, "w", encoding='UTF-8') as myfile:

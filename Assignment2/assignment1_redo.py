@@ -4,13 +4,11 @@ Assignment 1 Copy
 
 import csv
 
+
 def calc_scores(fastq_file, start, end):
     """
-    Calculates average phred scores per base of several quality lines and returns
-    a dict with the averages.
-    :param end:
-    :param start:
-    :param fastq_file:
+    Calculate quality scores for all given chunks.
+    :return:
     """
 
     # Create dictionaries
@@ -35,6 +33,22 @@ def calc_scores(fastq_file, start, end):
             count_dict[key] = round(count_dict[key] / length_per_base[key], 4)
 
         return count_dict
+
+
+def split_files(filename, cores):
+    """Function to allocate chunk data to cores"""
+    with open(filename[0], 'r', encoding='utf-8') as open_file:
+        for line, _ in enumerate(open_file):
+            pass
+    file_len = line + 1
+
+    chunk_size = int(file_len / cores[0])
+
+    while chunk_size % 4 != 0:
+        chunk_size += chunk_size % 4
+
+    line_list = [[x, x + chunk_size] for x in range(0, file_len, chunk_size)]
+    return line_list
 
 
 def write_output(output, avg_scores_per_file):
