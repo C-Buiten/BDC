@@ -11,9 +11,7 @@ def calc_scores(fastq_file, start, end):
     :return:
     """
 
-    # Create dictionaries
-    temp_dict = {i: chr(i) for i in range(128)}
-    ascii_dict = {a: z for z, a in temp_dict.items()}
+    # Create scores dicts
     count_dict = {}
     length_per_base = {}
 
@@ -22,10 +20,10 @@ def calc_scores(fastq_file, start, end):
             if start <= i <= end:
                 for count, char in enumerate(line):
                     if count in count_dict:
-                        count_dict[count] += ascii_dict[char] - 33
+                        count_dict[count] += ord(char) - 33
                         length_per_base[count] += 1
                     else:
-                        count_dict[count] = ascii_dict[char] - 33
+                        count_dict[count] = ord(char) - 33
                         length_per_base[count] = 1
 
         # Average the value by

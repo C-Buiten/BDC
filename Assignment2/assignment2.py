@@ -164,7 +164,7 @@ def run_workers(job_q, result_q, num_processes):
 
 
 def peon(job_q, result_q):
-    """Peon"""
+    """Peon func"""
     my_name = multiprocessing.current_process().name
     while True:
         try:
@@ -178,11 +178,11 @@ def peon(job_q, result_q):
                 print(f"Peon {my_name}s Workwork on {job['arg']}s!")
                 result_q.put({'job': job, 'result': result})
             except NameError:
-                print("Can't find yer fun Bob!")
+                print("Can't find Waldo!")
                 result_q.put({'job': job, 'result': ERROR})
 
         except queue.Empty:
-            print(f"sleepytime for{my_name}")
+            print(f"Putting {my_name} to sleep.")
             time.sleep(1)
 
 
