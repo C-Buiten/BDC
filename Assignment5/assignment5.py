@@ -4,15 +4,27 @@
 import argparse as ap
 import sys
 import csv
+import pyspark.sql
 
 
-def InterPRO(args):
+def InterPRO(input_file):
     """
     InterPRO spark function
     :param args:
     :return:
     """
-    return 1
+    results = []
+    results.append(one(input_file))
+
+    return results
+
+
+def one(file):
+    """One"""
+    distinct = file.select("_").distinct().count()
+    explain = file.explain()
+
+    return [distinct, explain]
 
 
 def write_output(results, output_file):
@@ -43,13 +55,15 @@ def arg_parser():
 def main():
     """
     Call InterPRO Spark functions
-    :param args:
     :return:
     """
 
     args = arg_parser()
 
-    answers = InterPRO(args)
+    sparks = pyspark.sql.SparkSession.builder.master('local[16]').appName("SparkTime").getOrCreate()
+    input_file = sparks.read.csv(args.tsv_file, header=False, sep="\t")
+
+    answers = InterPRO(input_file)
 
     write_output(answers, "output.csv")
 
