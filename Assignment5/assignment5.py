@@ -1,6 +1,7 @@
 # /data/dataprocessing/interproscan/all_bacilli.tsv
 # /data/datasets/EBI/interpro/refseqscan
 
+import argparse as ap
 import sys
 import csv
 
@@ -26,16 +27,32 @@ def write_output(results, output_file):
             csv_obj.writerow([question, answer])
 
 
-def main(args):
+def arg_parser():
+    """
+    Argument parser for the command line.
+    :return: The user-given command line arguments.
+    """
+    argparser = ap.ArgumentParser(description="Script voor Opdracht 1 van Big Data Computing")
+
+    argparser.add_argument("tsv_file", action="store", type=str,
+                           help="1 TSV file")
+    args = argparser.parse_args()
+
+    return args
+
+def main():
     """
     Call InterPRO Spark functions
     :param args:
     :return:
     """
+
+    args = arg_parser()
+
     answers = InterPRO(args)
 
     write_output(answers, "output.csv")
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())
