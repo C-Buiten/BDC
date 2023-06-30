@@ -107,7 +107,7 @@ def runserver(function, fastq, cores, port, host, output_file=None):
 
         for pos in results[0]['result']:
             output = str(pos) + "," + str(results[0]['result'][pos])
-            print("This: ", output)
+            print(output)
             sys.stdout.write(output + '\n')
 
 
@@ -246,7 +246,7 @@ def main():
 
     if args.client:
         print("Started client side")
-        client = multiprocessing.Process(target=runclient, args=(args.n, args.host, args.port,))
+        client = multiprocessing.Process(target=runclient, args=(args.ncores, args.host, args.port,))
         client.start()
         client.join()
 
