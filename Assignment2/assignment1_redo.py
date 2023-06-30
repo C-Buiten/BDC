@@ -16,15 +16,20 @@ def calc_scores(fastq_file, start, end):
     length_per_base = {}
 
     with open(fastq_file[0], "r", encoding="utf-8") as file:
+        line_num = 0
         for i, line in enumerate(file):
+            print(line_num)
             if start <= i <= end:
-                for count, char in enumerate(line):
-                    if count in count_dict:
-                        count_dict[count] += ord(char) - 33
-                        length_per_base[count] += 1
-                    else:
-                        count_dict[count] = ord(char) - 33
-                        length_per_base[count] = 1
+                if line_num == 3:
+                    for count, char in enumerate(line):
+                        if count in count_dict:
+                            count_dict[count] += ord(char) - 33
+                            length_per_base[count] += 1
+                        else:
+                            count_dict[count] = ord(char) - 33
+                            length_per_base[count] = 1
+                    line_num = 0
+            line_num += 1
 
         # Average the value by
         for key in count_dict:

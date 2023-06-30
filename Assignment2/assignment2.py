@@ -65,7 +65,6 @@ def runserver(function, fastq, cores, port, host, output_file=None):
     if not chunks:
         print("Zzzz...")
         return
-
     print("Data incoming!")
     for chunk in chunks:
         shared_job_q.put({'fn': function, 'arg': (fastq, chunk[0], chunk[1])})
@@ -95,18 +94,13 @@ def runserver(function, fastq, cores, port, host, output_file=None):
     manager.shutdown()
 
     if output_file:
-        print("Output file!")
         with open(output_file, "w", encoding='UTF-8') as myfile:
-            myfile.write(str(fastq[0]) + "\n")
-
             for pos in results[0]['result']:
-                output = str(pos) + "," + str(results[0]['result'][pos])
+                output = str(pos+1) + "," + str(results[0]['result'][pos])
                 myfile.write(output + "\n")
     else:
-        sys.stdout.write(str(fastq[0]) + "\n")
-
         for pos in results[0]['result']:
-            output = str(pos) + "," + str(results[0]['result'][pos])
+            output = str(pos+1) + "," + str(results[0]['result'][pos])
             print(output)
             sys.stdout.write(output + '\n')
 
