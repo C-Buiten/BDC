@@ -21,7 +21,7 @@ def InterPRO(input_file):
 
 def one(file):
     """One"""
-    distinct = file.select("_").distinct().count()
+    distinct = file.select("_c11").distinct().count()
     explain = file.explain()
 
     return [distinct, explain]
