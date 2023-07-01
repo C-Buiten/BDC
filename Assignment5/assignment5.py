@@ -5,11 +5,13 @@ import argparse as ap
 import sys
 import csv
 import pyspark.sql
+import pyspark.sql.functions
 
 
 def InterPRO(input_file):
     """
     InterPRO spark function
+    :param input_file: Input InterPROScan.tsv
     :param args:
     :return:
     """
@@ -20,11 +22,24 @@ def InterPRO(input_file):
 
 
 def one(file):
-    """One"""
+    """How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
+    def explain(self, extended=False):
+        if extended:
+            print(self._jdf.queryExecution().toString())
+        else:
+            print(self._jdf.queryExecution().simpleString())
+    """
     distinct = file.select("_c11").distinct().count()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [distinct, explain]
+
+def two(file):
+    """How many annotations does a protein have on average?"""
+    avg_anno = file.groupBy("_c0").count().select(pyspark.sql.functions.mean("count")).collect()[0][0]
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    return [avg_anno, explain]
 
 
 def write_output(results, output_file):
