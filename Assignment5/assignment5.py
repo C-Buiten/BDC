@@ -36,12 +36,14 @@ def one(file):
 
     return [distinct, explain]
 
+
 def two(file):
     """How many annotations does a protein have on average?"""
     avg_anno = file.groupBy("_c0").count().select(pyspark.sql.functions.mean("count")).collect()[0][0]
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [avg_anno, explain]
+
 
 def three(file):
     """What is the most common GO Term found?"""
@@ -50,26 +52,40 @@ def three(file):
 
     return [go_term, explain]
 
+
 def four(file):
     """What is the average size of an InterPRO feature found in the dataset?"""
+    return
+
 
 def five(file):
     """What is the top 10 most common InterPRO features?"""
+    return
+
 
 def six(file):
     """If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?"""
+    return
+
 
 def seven(file):
     """If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?"""
+    return
+
 
 def eight(file):
     """And the top 10 least common?"""
+    return
+
 
 def nine(file):
     """Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?"""
+    return
+
 
 def ten(file):
     """What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?"""
+    return
 
 
 def write_output(results, output_file):
