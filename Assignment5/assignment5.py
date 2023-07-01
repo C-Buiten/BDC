@@ -22,7 +22,7 @@ def InterPRO(input_file):
 def one(file):
     """One"""
     distinct = file.select("_c11").distinct().count()
-    explain = file.explain()
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [distinct, explain]
 
