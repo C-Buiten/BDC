@@ -55,7 +55,10 @@ def three(file):
 
 def four(file):
     """What is the average size of an InterPRO feature found in the dataset?"""
-    return
+    avg_size = file.select(pyspark.sql.functions.mean("_c2")).collect()[0][0]
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    return [avg_size, explain]
 
 
 def five(file):
