@@ -3,6 +3,8 @@ Assignment 1 Copy
 """
 
 import csv
+import sys
+import argparse as ap
 
 
 def calc_scores(fastq_file, start, end):
@@ -16,20 +18,21 @@ def calc_scores(fastq_file, start, end):
     length_per_base = {}
 
     with open(fastq_file[0], "r", encoding="utf-8") as file:
-        line_num = 0
-        for i, line in enumerate(file):
-            print(line_num)
+        data = file.read().split("\n")
+        prev_line = ""
+        for i, line in enumerate(data):
             if start <= i <= end:
-                if line_num == 3:
-                    for count, char in enumerate(line):
-                        if count in count_dict:
-                            count_dict[count] += ord(char) - 33
-                            length_per_base[count] += 1
+                if prev_line == "+":
+                    print(line)
+                    for pos, char in enumerate(line.strip(), start=1):
+                        if pos in count_dict:
+                            count_dict[pos] += ord(char) - 33
+                            length_per_base[pos] += 1
                         else:
-                            count_dict[count] = ord(char) - 33
-                            length_per_base[count] = 1
-                    line_num = 0
-            line_num += 1
+                            count_dict[pos] = ord(char) - 33
+                            length_per_base[pos] = 1
+            prev_line = line
+
 
         # Average the value by
         for key in count_dict:
@@ -70,3 +73,31 @@ def write_output(output, avg_scores_per_file):
             for avg_scores in avg_scores_per_file:
                 for i, avg in enumerate(avg_scores, start=1):
                     csv_obj.writerow([i, avg])
+
+
+def arg_parser():
+    """
+    Argument parser for the command line.
+    :return: The user-given command line arguments.
+    """
+    argparser = ap.ArgumentParser(description="Script voor Opdracht 1 van Big Data Computing")
+    argparser.add_argument("fastq_files", action="store", type=str, nargs='+',
+                           help="Minstens 1 Illumina Fastq Format file om te verwerken")
+    args = argparser.parse_args()
+
+    return args
+
+
+def main():
+    """
+    Main function of the script.
+    """
+    # Collect command line arguments
+    args = arg_parser()
+    files = args.fastq_files
+
+    print(calc_scores(files, 0, 19))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
