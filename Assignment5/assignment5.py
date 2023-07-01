@@ -15,8 +15,10 @@ def InterPRO(input_file):
     :param args:
     :return:
     """
+    questions = [one, two, three, four, five, six, seven, eight, nine, ten]
     results = []
-    results.append(one(input_file))
+    for function in questions:
+        results.append(function(input_file))
 
     return results
 
@@ -40,6 +42,34 @@ def two(file):
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [avg_anno, explain]
+
+def three(file):
+    """What is the most common GO Term found?"""
+    go_term = file.groupby('_c13').count().orderBy(pyspark.sql.functions.desc('count')).take(1)
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    return [go_term, explain]
+
+def four(file):
+    """What is the average size of an InterPRO feature found in the dataset?"""
+
+def five(file):
+    """What is the top 10 most common InterPRO features?"""
+
+def six(file):
+    """If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?"""
+
+def seven(file):
+    """If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?"""
+
+def eight(file):
+    """And the top 10 least common?"""
+
+def nine(file):
+    """Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?"""
+
+def ten(file):
+    """What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?"""
 
 
 def write_output(results, output_file):
