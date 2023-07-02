@@ -1,3 +1,9 @@
+#!/usr/local/bin/python3
+
+"""
+Assignment 5
+"""
+
 # /data/dataprocessing/interproscan/all_bacilli.tsv
 # /data/datasets/EBI/interpro/refseqscan
 
@@ -8,7 +14,7 @@ import pyspark.sql
 import pyspark.sql.functions
 
 
-def InterPRO(input_file):
+def interpro(input_file):
     """
     InterPRO spark function
     :param input_file: Input InterPROScan.tsv
@@ -103,10 +109,10 @@ def nine(file):
 
 def ten(file):
     """What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?"""
-    R2 = file.groupby("_c11").agg(pyspark.sql.functions.avg("_c2"), pyspark.sql.functions.count("_c11")).stat.corr("_c2", "_c11")
+    corr_coeff = file.groupby("_c11").agg(pyspark.sql.functions.avg("_c2"), pyspark.sql.functions.count("_c11")).stat.corr("_c2", "_c11")
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
-    return [R2, explain]
+    return [corr_coeff, explain]
 
 
 def write_output(results, output_file):
@@ -115,7 +121,7 @@ def write_output(results, output_file):
     :return:
     """
 
-    with open(output_file, "a", newline='') as file:
+    with open(output_file, "a", newline='', encoding="UTF-8") as file:
         csv_obj = csv.writer(file, delimiter=",")
         for question, answer in enumerate(results, start=1):
             csv_obj.writerow([question, answer])
@@ -145,7 +151,7 @@ def main():
     sparks = pyspark.sql.SparkSession.builder.master('local[16]').appName("SparkTime").getOrCreate()
     input_file = sparks.read.csv(args.tsv_file, header=False, sep="\t")
 
-    answers = InterPRO(input_file)
+    answers = interpro(input_file)
 
     write_output(answers, "output.csv")
 
