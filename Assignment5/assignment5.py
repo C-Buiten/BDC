@@ -63,12 +63,18 @@ def four(file):
 
 def five(file):
     """What is the top 10 most common InterPRO features?"""
-    return
+    feat_top10 = file.filter.groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    return [feat_top10, explain]
 
 
 def six(file):
     """If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?"""
-    return
+    feat90_top10 = file.withColumn("coverage", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("coverage") > 0.9).groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    return [feat90_top10, explain]
 
 
 def seven(file):
