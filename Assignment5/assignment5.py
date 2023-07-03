@@ -69,7 +69,7 @@ def four(file):
 
 def five(file):
     """What is the top 10 most common InterPRO features?"""
-    feat_top10 = file.groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    feat_top10 = file.filter(file._c11 != "-").groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [feat_top10, explain]
@@ -77,7 +77,7 @@ def five(file):
 
 def six(file):
     """If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?"""
-    feat90_top10 = file.withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("size") > 0.9).groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    feat90_top10 = file.filter(file._c11 != "-").withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("size") > 0.9).groupby("_c11").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [feat90_top10, explain]
@@ -85,7 +85,7 @@ def six(file):
 
 def seven(file):
     """If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?"""
-    anno_top10 = file.groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    anno_top10 = file.filter(file._c12 != "-").groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [anno_top10, explain]
@@ -101,7 +101,7 @@ def eight(file):
 
 def nine(file):
     """Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?"""
-    top10_67 = file.withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("size") > 0.9).groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    top10_67 = file.filter(file._c12 != "-").withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("size") > 0.9).groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [top10_67, explain]
@@ -109,8 +109,10 @@ def nine(file):
 
 def ten(file):
     """What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?"""
-    corr_coeff = file.groupby("_c11").agg(pyspark.sql.functions.avg("_c2"), pyspark.sql.functions.count("_c11")).stat.corr("_c2", "_c11")
+    temp = file.groupby("_c11").agg(pyspark.sql.functions.avg("_c2").alias("c2"), pyspark.sql.functions.count("_c11").alias("c11"))
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
+
+    corr_coeff = temp.stat.corr("c2", "c11")
 
     return [corr_coeff, explain]
 
@@ -124,7 +126,8 @@ def write_output(results, output_file):
     with open(output_file, "a", newline='', encoding="UTF-8") as file:
         csv_obj = csv.writer(file, delimiter=",")
         for question, answer in enumerate(results, start=1):
-            csv_obj.writerow([question, answer])
+            #print(question, answer)
+            csv_obj.writerow([question, answer[0], answer[1]])
 
 
 def arg_parser():
@@ -146,11 +149,10 @@ def main():
     :return:
     """
 
-    args = arg_parser()
+    # args = arg_parser()
 
     sparks = pyspark.sql.SparkSession.builder.master('local[16]').appName("SparkTime").getOrCreate()
-    input_file = sparks.read.csv(args.tsv_file, header=False, sep="\t")
-
+    input_file = sparks.read.csv("testset.tsv", header=False, sep="\t")
     answers = interpro(input_file)
 
     write_output(answers, "output.csv")
