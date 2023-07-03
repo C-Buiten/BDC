@@ -101,7 +101,7 @@ def eight(file):
 
 def nine(file):
     """Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?"""
-    top10_67 = file.withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("coverage") > 0.9).groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
+    top10_67 = file.withColumn("size", file._c7 - file._c6 / file._c2).filter(pyspark.sql.functions.col("size") > 0.9).groupby("_c12").count().sort(pyspark.sql.functions.col("count").desc()).limit(10).collect()
     explain = file._jdf.queryExecution().toString().split("\n\n")[3]
 
     return [top10_67, explain]
